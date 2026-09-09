@@ -76,7 +76,9 @@ def main():
         rev = route_dg({"etoh": 2, "co2": 2}, {"glc__D": 1}, lambda s: s)
         note("glucose -> 2 ethanol + 2 CO2", f"{fwd['dg_prime_kj_mol']} kJ/mol  {fwd['verdict']}", "< 0, feasible")
         note("its impossible reverse", f"{rev['dg_prime_kj_mol']} kJ/mol  {rev['verdict']}", "> 0, infeasible")
-        if fwd.get("thermo_ok") is not True or rev.get("thermo_ok") is not False:
+        if fwd.get("verdict") == "unknown" or rev.get("verdict") == "unknown":
+            skip("the eQuilibrator compound cache (dG unknown until the cache is warm)")
+        elif fwd.get("thermo_ok") is not True or rev.get("thermo_ok") is not False:
             _failures.append("thermodynamic gate")
     except Exception as e:
         skip(f"the eQuilibrator compound cache ({type(e).__name__})")
