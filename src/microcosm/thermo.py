@@ -19,6 +19,7 @@ eQuilibrator stays BEHIND this seam (a sanctioned thermodynamics seam).
 from __future__ import annotations
 
 _CC = None
+_CC_FAILED = False
 _COMPOUND_CACHE: dict = {}
 
 # BiGG-id -> KEGG-id fallback for compounds whose BiGG entry in the local eQuilibrator cache is a STRUCTURELESS
@@ -33,14 +34,48 @@ _KEGG_FALLBACK = {
 
 
 def _cc():
-    global _CC
-    if _CC is None:
-        from equilibrator_api import ComponentContribution, Q_
-        cc = ComponentContribution()
-        cc.p_h = Q_(7.0)
-        cc.ionic_strength = Q_("0.25M")
-        cc.temperature = Q_("298.15K")
-        _CC = cc
+    """ComponentContribution singleton. The FIRST call may download the eQuilibrator compound cache (~1 GB);
+    that fetch is BOUNDED -- a per-read socket-stall timeout plus a hard total cap, run in a daemon thread so
+    the bound holds regardless of how the download library handles timeouts -- so a stalled or unreachable
+    download RAISES instead of hanging forever. Callers (_compound, transform_dg, route_dg) already convert that
+    into verdict 'unknown'/unmapped rather than blocking, and a failed init is remembered so later calls fail
+    fast instead of re-hanging. Override the bounds with MICROCOSM_CC_TIMEOUT / MICROCOSM_CC_STALL (seconds)."""
+    global _CC, _CC_FAILED
+    if _CC is not None:
+        return _CC
+    if _CC_FAILED:
+        raise RuntimeError("eQuilibrator ComponentContribution unavailable (a prior init failed or timed out)")
+    import os
+    import socket
+    import threading
+    from equilibrator_api import ComponentContribution, Q_
+    total_s = float(os.environ.get("MICROCOSM_CC_TIMEOUT", "600"))   # hard cap on the first-run cache fetch
+    stall_s = float(os.environ.get("MICROCOSM_CC_STALL", "90"))      # per-read socket-stall bound
+    box: dict = {}
+
+    def _build():
+        prev = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(stall_s)              # a stalled SSL read raises instead of blocking forever
+        try:
+            box["cc"] = ComponentContribution()
+        except Exception as e:                          # record ANY init failure so callers fail fast
+            box["err"] = e
+        finally:
+            socket.setdefaulttimeout(prev)
+
+    t = threading.Thread(target=_build, name="eq-cc-init", daemon=True)
+    t.start()
+    t.join(total_s)
+    if "cc" not in box:                                 # still alive (timed out) or raised inside the thread
+        _CC_FAILED = True
+        if "err" in box:
+            raise RuntimeError(f"eQuilibrator init failed: {type(box['err']).__name__}: {str(box['err'])[:80]}")
+        raise TimeoutError(f"eQuilibrator cache init exceeded {total_s:.0f}s (stalled or unreachable download)")
+    cc = box["cc"]
+    cc.p_h = Q_(7.0)
+    cc.ionic_strength = Q_("0.25M")
+    cc.temperature = Q_("298.15K")
+    _CC = cc
     return _CC
 
 
