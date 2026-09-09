@@ -1,0 +1,19 @@
+{
+  "id": "pritchard_glycolysis",
+  "name": "Yeast glycolysis (Pritchard 2002) as a black box",
+  "kind": "reaction_network",
+  "schema_version": "1.0",
+  "open_boundary": true,
+  "provenance": [
+    {"source": "BioModels-CC0", "ref": "BIOMD0000000172", "retrieved": "2026-07-10", "confidence": "curated"},
+    {"source": "publication", "ref": "Pritchard & Kell 2002 Eur J Biochem", "retrieved": "2026-07-10"}
+  ],
+  "notes": "CONSOLIDATION component (stopping-rule test): a second real kinetic glycolysis model. Reuses the sbml machinery unchanged; its glucose + pyruvate reconcile with Teusink AND the FBA box by canonical ChEBI identity + actual-atom formulas (a 3-way identity cross-check). OPEN by construction, same as Teusink: a partial 2-port projection (glucose in, pyruvate out) whose balancing intracellular species (H+, H2O, NAD(H), ATP) are not medium ports, so it exchanges those atoms with an unmodelled intracellular compartment.",
+  "transfer": {"type": "sbml", "path": "data/pritchard_glycolysis.xml",
+               "port_map": {"GLCi": "glucose", "PYR": "pyruvate"}},
+  "ports": {
+    "glucose":  {"formula": "C6H12O6", "role": "input",  "entity_id": "ChEBI:4167"},
+    "pyruvate": {"formula": "C3H3O3",  "role": "output", "entity_id": "ChEBI:15361"}
+  },
+  "validity": {"note": "kinetic model; unit compartment assumed (amount~conc), consistent with Teusink"}
+}

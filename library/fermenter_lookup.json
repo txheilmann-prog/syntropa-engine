@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "id": "fermenter_lookup",
+  "name": "Fermenter (experimental lookup: glucose -> ethanol + CO2)",
+  "kind": "lookup",
+  "provenance": [
+    {"source": "synthetic-lab-table", "ref": "glucose-dependent fermentation rate", "retrieved": "2026-07-10"}
+  ],
+  "transfer": {"type": "lookup", "inputs": ["glucose"], "table": [
+    {"when": {"glucose": 0.0},  "rates": {"glucose": 0.0,  "ethanol": 0.0,  "CO2": 0.0}},
+    {"when": {"glucose": 5.0},  "rates": {"glucose": -2.0, "ethanol": 4.0,  "CO2": 4.0}},
+    {"when": {"glucose": 20.0}, "rates": {"glucose": -6.0, "ethanol": 12.0, "CO2": 12.0}}
+  ]},
+  "ports": {
+    "glucose": {"formula": "C6H12O6", "role": "input"},
+    "ethanol": {"formula": "C2H6O",   "role": "output"},
+    "CO2":     {"formula": "CO2",      "role": "output"}
+  },
+  "validity": {"glucose": [0.0, 20.0], "note": "table valid only within measured glucose range"}
+}

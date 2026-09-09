@@ -1,0 +1,116 @@
+{
+ "id": "fba_cyanobacterium",
+ "name": "Synechocystis sp. PCC 6803 cyanobacterium (iJN678, oxygenic photoautotroph)",
+ "kind": "organism",
+ "schema_version": "1.0",
+ "open_boundary": true,
+ "provenance": [
+  {
+   "source": "BiGG",
+   "ref": "iJN678",
+   "retrieved": "2026-07-10",
+   "confidence": "curated"
+  },
+  {
+   "source": "Nogales2012",
+   "ref": "PNAS 109:2678 (Synechocystis reconstruction)",
+   "retrieved": "2026-07-10"
+  }
+ ],
+ "notes": "A REAL photoautotroph (3rd organism): oxygenic photosynthesis -- fixes CO2 using LIGHT and evolves O2. Verified photoautotrophic (light+CO2, no organics -> growth 0.167, O2 produced). Popped out two things: (1) LIGHT as an FBA input is a NON-CHEMICAL species (BiGG formula 'Z' = radiant energy) -> maps to a chemical:false 'light' port, reconciling with the phenomenological phototroph. (2) dFBA MEDIUM CONTROL: this genome-scale model leaves glucose default-open, so it could grow on PHANTOM carbon; glucose is therefore MAPPED as an input (gated by the medium) so it can only use carbon the microcosm medium provides. Trace minerals (K, SO4, Fe, Mg, ...) stay unmapped/freely-available (realistic, not carbon cheats). Oxygenic -> declares an OXIDIZING redox window, so it correctly cannot share a well-mixed medium with the strict-anaerobe methanogen (O2 poisons methanogens).",
+ "transfer": {
+  "type": "fba",
+  "path": "data/icyano.xml",
+  "vmax": 100.0,
+  "port_map": {
+   "EX_photon_e": "light",
+   "EX_co2_e": "CO2",
+   "EX_hco3_e": "bicarbonate",
+   "EX_glc__D_e": "glucose",
+   "EX_no3_e": "nitrate",
+   "EX_nh4_e": "ammonium",
+   "EX_pi_e": "phosphate",
+   "EX_o2_e": "O2",
+   "EX_h2o_e": "H2O",
+   "EX_h_e": "H_ext"
+  }
+ },
+ "ports": {
+  "light": {
+   "formula": null,
+   "role": "input",
+   "chemical": false,
+   "entity_id": "PATO:radiant-energy"
+  },
+  "CO2": {
+   "formula": "CO2",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:16526"
+  },
+  "bicarbonate": {
+   "formula": "CHO3",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:17544"
+  },
+  "glucose": {
+   "formula": "C6H12O6",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:4167"
+  },
+  "nitrate": {
+   "formula": "NO3",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:17632"
+  },
+  "ammonium": {
+   "formula": "H4N",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:28938"
+  },
+  "phosphate": {
+   "formula": "HO4P",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:43474"
+  },
+  "O2": {
+   "formula": "O2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15379"
+  },
+  "H2O": {
+   "formula": "H2O",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15377"
+  },
+  "H_ext": {
+   "formula": "H",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15378"
+  }
+ },
+ "validity": {
+  "note": "dynamic FBA; oxygenic photoautotroph. Photon uptake needs a high vmax (photons are cheap, plentiful)."
+ },
+ "context": {
+  "phase": "aqueous",
+  "requires": [
+   "H2O"
+  ],
+  "ranges": {
+   "Eh_mV": [
+    50.0,
+    500.0
+   ]
+  },
+  "o2_relationship": "oxygenic-phototroph (aerobe)"
+ }
+}

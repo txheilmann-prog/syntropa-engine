@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "id": "phototroph_generic",
+  "name": "Generic phototroph (photosynthesis, first-principles)",
+  "kind": "chemistry",
+  "provenance": [
+    {"source": "first-principles", "ref": "photosynthesis net equation", "retrieved": "2026-07-10"},
+    {"source": "textbook", "ref": "6 CO2 + 6 H2O -> C6H12O6 + 6 O2", "retrieved": "2026-07-10"},
+    {"source": "Stumm & Morgan, Aquatic Chemistry (3rd ed., 1996), redox-sequence ladder", "ref": "oxygenic photosynthesis evolves O2 and poises circumneutral water in the OXIDIZING window Eh ~ +50..+500 mV (same oxic band as aerobic respiration); strict anaerobes (methanogenesis, Eh < -200 mV) cannot share this medium", "retrieved": "2026-07-11", "confidence": "textbook"}
+  ],
+  "transfer": {"type": "function", "name": "photosynthesis"},
+  "ports": {
+    "light":   {"formula": null,        "role": "environment", "chemical": false, "entity_id": "PATO:radiant-energy"},
+    "CO2":     {"formula": "CO2",        "role": "input"},
+    "H2O":     {"formula": "H2O",        "role": "input"},
+    "glucose": {"formula": "C6H12O6",    "role": "output"},
+    "O2":      {"formula": "O2",         "role": "output"}
+  },
+  "params": {"rate": {"default": 0.3, "range": [0.0, 2.0]}},
+  "validity": {"note": "phenomenological; valid where light/CO2/H2O are non-limiting proxies"},
+  "context": {"phase": "aqueous", "ranges": {"Eh_mV": [50.0, 500.0]}}
+}

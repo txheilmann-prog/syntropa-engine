@@ -1,0 +1,8 @@
+Syntropa
+Copyright 2026 Craig Heilmann
+
+Developed as part of the Syntropa project.
+
+This software builds on and interoperates with third-party open-source libraries (Vivarium, libRoadRunner,
+COBRApy, MICOM, eQuilibrator), each under its own license. Demonstration models under library/ retain their own
+upstream licenses; see MODELS.md. Licensed under the Apache License, Version 2.0 (see LICENSE).

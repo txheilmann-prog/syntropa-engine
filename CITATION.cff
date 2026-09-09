@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it (metadata below) and the Syntropa preprint (https://doi.org/10.5281/zenodo.22129408)."
+title: "Syntropa: a physics-gated substrate for composing and validating heterogeneous cell and ecosystem models"
+abstract: "A Python substrate for composing heterogeneous biological models (first-principles reactions, empirical lookups, kinetic SBML, genome-scale FBA) into micro-ecosystems checked by a layered physics-based validity stack."
+authors:
+  - family-names: Heilmann
+    given-names: Craig
+    orcid: "https://orcid.org/0009-0007-6648-7076"
+license: Apache-2.0
+repository-code: "https://github.com/txheilmann-prog/syntropa-engine"
+url: "https://github.com/txheilmann-prog/syntropa-engine"
+version: 0.1.0
+date-released: "2026-09-02"
+keywords:
+  - systems biology
+  - model composition
+  - flux balance analysis
+  - thermodynamics
+  - reproducibility

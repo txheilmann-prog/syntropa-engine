@@ -1,0 +1,23 @@
+{
+  "id": "respiration_generic",
+  "name": "Generic aerobic respiration (C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O)",
+  "kind": "chemistry",
+  "schema_version": "1.0",
+  "open_boundary": false,
+  "provenance": [
+    {"source": "first-principles", "ref": "respiration net equation", "retrieved": "2026-07-10", "confidence": "first_principles"},
+    {"source": "textbook", "ref": "C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O", "retrieved": "2026-07-10"},
+    {"source": "Stumm & Morgan, Aquatic Chemistry (3rd ed., 1996), redox-sequence ladder", "ref": "aerobic respiration requires the OXIDIZING window Eh ~ +50..+500 mV (O2/H2O couple, circumneutral oxic water); disjoint from strict-anaerobe methanogenesis (Eh < -200 mV)", "retrieved": "2026-07-11", "confidence": "textbook"}
+  ],
+  "notes": "CONSOLIDATION component #2 (stopping-rule test): the mirror of photosynthesis, a closed atom-balanced function box using ONLY already-grounded species (glucose, O2, CO2, H2O) with canonical ChEBI ids. It exercises no new transfer type, dimension, facet, or identity mechanism. Together with pritchard_glycolysis (also dry) this is the second consecutive component that surfaces nothing new -> the stopping rule for a schema-v1 freeze is met. Chains with phototroph_generic into a closed carbon cycle.",
+  "transfer": {"type": "function", "name": "aerobic_respiration"},
+  "params": {"rate": {"default": 0.2, "range": [0.0, 2.0]}},
+  "ports": {
+    "glucose": {"formula": "C6H12O6", "role": "input",  "chemical": true, "entity_id": "ChEBI:4167"},
+    "O2":      {"formula": "O2",      "role": "input",  "chemical": true, "entity_id": "ChEBI:15379"},
+    "CO2":     {"formula": "CO2",     "role": "output", "chemical": true, "entity_id": "ChEBI:16526"},
+    "H2O":     {"formula": "H2O",     "role": "output", "chemical": true, "entity_id": "ChEBI:15377"}
+  },
+  "validity": {"note": "phenomenological; valid where glucose and O2 are the limiting reactants"},
+  "context": {"phase": "aqueous", "ranges": {"Eh_mV": [50.0, 500.0]}}
+}

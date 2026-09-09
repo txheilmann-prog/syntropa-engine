@@ -1,0 +1,96 @@
+{
+ "id": "fba_methanotroph",
+ "name": "Aerobic methanotroph (coarse lumped black box; M. capsulatus Bath yield)",
+ "kind": "organism",
+ "schema_version": "1.0",
+ "open_boundary": true,
+ "provenance": [
+  {
+   "source": "biomass composition",
+   "ref": "CH2O0.5N0.25 standard microbial C-mole formula (~25.5 g/C-mol); biomass unit here = C4H8O2N = 4x monomer",
+   "retrieved": "2026-07-11",
+   "confidence": "textbook"
+  },
+  {
+   "source": "growth yield",
+   "ref": "Methylococcus capsulatus (Bath) ~0.64 g dry wt / g CH4 -> molar carbon-conversion efficiency ~0.40 C-to-biomass; methanotroph biocatalyst literature incl. mSphere 2024 doi:10.1128/msphere.00496-24",
+   "retrieved": "2026-07-11",
+   "confidence": "published"
+  },
+  {
+   "source": "derivation",
+   "ref": "COARSE LUMPED single growth reaction: 10 CH4 + 15.75 O2 + NH4+ -> C4H8O2N + 6 CO2 + 17.5 H2O + H+ ; CCE and biomass formula are cited, all coefficients then fixed by C/H/O/N/charge conservation (documented in scripts/build_methanotroph.py). NOMINAL/coarse: no mechanistic pathway, no methanol/formaldehyde intermediates, no maintenance term.",
+   "retrieved": "2026-07-11",
+   "confidence": "nominal-grounded"
+  }
+ ],
+ "notes": "A fit-for-purpose METHANE-CAPTURE unit and the aerobic mirror of fba_methanogen (a methane PRODUCER). At optimum it CONSUMES methane + O2 + ammonium and produces biomass (single-cell protein) + CO2 + H2O -- captures/transforms the greenhouse gas CH4 into useful biomass. Deliberately a COARSE black box built from published yield (no local methanotroph GEM; BiGG/EBI unreachable), honestly labelled: the lumped stoichiometry is authoritative-yield-grounded, not a mechanistic reconstruction. Its Eh window is OXIC (aerobe), disjoint from the methanogen's reducing window, so the composition-validity gate correctly refuses to co-mix a methane producer and an aerobic methane consumer in one well-mixed medium.",
+ "transfer": {
+  "type": "fba",
+  "path": "data/imethanotroph_lumped.xml",
+  "vmax": 10.0,
+  "port_map": {
+   "EX_ch4_e": "methane",
+   "EX_o2_e": "O2",
+   "EX_nh4_e": "ammonium",
+   "EX_co2_e": "CO2",
+   "EX_h2o_e": "H2O",
+   "EX_h_e": "H_ext"
+  }
+ },
+ "ports": {
+  "methane": {
+   "formula": "CH4",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:16183"
+  },
+  "O2": {
+   "formula": "O2",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:15379"
+  },
+  "ammonium": {
+   "formula": "H4N",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:28938"
+  },
+  "CO2": {
+   "formula": "CO2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16526"
+  },
+  "H2O": {
+   "formula": "H2O",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15377"
+  },
+  "H_ext": {
+   "formula": "H",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15378"
+  }
+ },
+ "validity": {
+  "note": "coarse lumped FBA; obligate aerobe (needs O2). Single growth reaction; fluxes mmol/gDW/h-scale, nominal."
+ },
+ "context": {
+  "phase": "aqueous",
+  "requires": [
+   "H2O",
+   "O2"
+  ],
+  "ranges": {
+   "Eh_mV": [
+    50.0,
+    500.0
+   ]
+  },
+  "o2_relationship": "obligate-aerobe"
+ }
+}

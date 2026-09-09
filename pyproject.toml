@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "syntropa-engine"
+version = "0.1.0"
+description = "A physics-gated black-box netlist simulator: compose heterogeneous cell/ecosystem models (kinetic ODE, genome-scale FBA, lookup tables, first-principles reactions) over a shared, grounded medium, with a layered validity stack (composition-validity, conservation, per-box domains)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Craig Heilmann" }]
+keywords = ["systems-biology", "model-composition", "co-simulation", "flux-balance-analysis", "reproducibility"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "vivarium-core",
+    "python-libsbml",
+    "libroadrunner",
+    "cobra",
+    "micom",
+    "osqp",
+    "equilibrator-api",
+    "scipy",
+    "numpy",
+    "pandas",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-timeout"]
+dev = ["pytest", "pytest-timeout", "ruff"]
+
+[project.urls]
+Homepage = "https://github.com/txheilmann-prog/syntropa-engine"
+Repository = "https://github.com/txheilmann-prog/syntropa-engine"
+Issues = "https://github.com/txheilmann-prog/syntropa-engine/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Per-test RUNAWAY BACKSTOP (pytest-timeout). Without a per-test cap, a single hung or exploded test can hold the
+# whole suite hostage and MASK every other failure behind it. This bounds EACH test so a runaway fails loud with a
+# stack dump instead of a silent hang. 900s is a runaway detector, not a perf gate: the slowest legitimate test
+# (~205s) has ~4x headroom, so it never flakes a real test even under load.
+timeout = 900
+# 'slow' = FBA/micom or concurrency-timing tests (tens of seconds each). They are contention-sensitive on a shared
+# machine, so the full suite can run long when the box is loaded. They are marked at MODULE level (one pytestmark
+# line per file), so a fast tier can run `-m "not slow"` for a quick local check while CI runs everything. NOTHING
+# is skipped on the authoritative gate.
+markers = [
+    "slow: FBA/micom or concurrency-timing test; excluded from the fast local build tier (still run on CI)",
+]

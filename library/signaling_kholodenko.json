@@ -1,0 +1,33 @@
+{
+  "id": "signaling_kholodenko",
+  "name": "Kholodenko2000 MAPK cascade (protein signaling; non-chemical species)",
+  "kind": "reaction_network",
+  "schema_version": "1.0",
+  "provenance": [
+    {"source": "BioModels-CC0", "ref": "BIOMD0000000010", "retrieved": "2026-07-10"},
+    {"source": "Kholodenko2000", "ref": "doi:10.1046/j.1432-1327.2000.01197.x", "retrieved": "2026-07-10"}
+  ],
+  "notes": "The stress-test for schema-v1 TODO #1: every species is a PROTEIN phospho-state (Mos/Mek1/Erk2 and their -P/-PP forms), NOT a chemical. They have no molecular formula and cannot be mass-checked; they are conserved by identity. Grounding via UniProt, not ChEBI/InChIKey. The conservation monitor must SKIP these, never false-flag them.",
+  "transfer": {
+    "type": "sbml",
+    "path": "data/kholodenko_mapk.xml",
+    "port_map": {
+      "MKKK": "MKKK", "MKKK_P": "MKKK_P",
+      "MKK": "MKK", "MKK_P": "MKK_P", "MKK_PP": "MKK_PP",
+      "MAPK": "MAPK", "MAPK_P": "MAPK_P", "MAPK_PP": "MAPK_PP"
+    }
+  },
+  "ports": {
+    "MKKK":    {"role": "modifier", "chemical": false, "entity_id": "UniProt:P01116", "formula": null},
+    "MKKK_P":  {"role": "modifier", "chemical": false, "entity_id": "UniProt:P01116", "formula": null},
+    "MKK":     {"role": "modifier", "chemical": false, "entity_id": "UniProt:Q05116", "formula": null},
+    "MKK_P":   {"role": "modifier", "chemical": false, "entity_id": "UniProt:Q05116", "formula": null},
+    "MKK_PP":  {"role": "modifier", "chemical": false, "entity_id": "UniProt:Q05116", "formula": null},
+    "MAPK":    {"role": "modifier", "chemical": false, "entity_id": "UniProt:P26696", "formula": null},
+    "MAPK_P":  {"role": "modifier", "chemical": false, "entity_id": "UniProt:P26696", "formula": null},
+    "MAPK_PP": {"role": "output",   "chemical": false, "entity_id": "UniProt:P26696", "formula": null}
+  },
+  "validity": {
+    "note": "signaling ODE model; protein phospho-states, not mass-conserved at the atom level (moiety-conserved: total MKKK/MKK/MAPK each constant)"
+  }
+}

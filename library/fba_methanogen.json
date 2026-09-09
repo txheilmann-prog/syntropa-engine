@@ -1,0 +1,115 @@
+{
+ "id": "fba_methanogen",
+ "name": "Methanosarcina barkeri methanogen (iAF692, genome-scale FBA)",
+ "kind": "organism",
+ "schema_version": "1.0",
+ "open_boundary": true,
+ "provenance": [
+  {
+   "source": "BiGG",
+   "ref": "iAF692",
+   "retrieved": "2026-07-10",
+   "confidence": "curated"
+  },
+  {
+   "source": "Feist2006",
+   "ref": "Mol Syst Biol 2:2006.0004 (M. barkeri reconstruction)",
+   "retrieved": "2026-07-10"
+  },
+  {
+   "source": "Stumm & Morgan, Aquatic Chemistry (3rd ed., 1996), redox-sequence ladder",
+   "ref": "methanogenesis / CO2 reduction sits at the REDUCING foot of the aquatic redox ladder, Eh ~ -400..-200 mV; O2 is toxic to methanogens, so this window is disjoint from any oxic box",
+   "retrieved": "2026-07-11",
+   "confidence": "textbook"
+  }
+ ],
+ "notes": "A genuinely DIFFERENT organism (second FBA box, first non-E.coli): a strictly anaerobic methanogen. At optimum it consumes methanol + trace nutrients and PRODUCES METHANE (CH4) -- methylotrophic methanogenesis. It can also use H2/CO2 (hydrogenotrophic) and acetate (acetoclastic). Enables SYNTROPHY ecosystems: a fermenter/E.coli produces acetate + H2, the methanogen consumes them -> methane. Shared species (CO2, H2O, H+, ammonium, phosphate, acetate) reconcile with the E. coli box by canonical ChEBI identity + identical BiGG formulas; adds methanol, methane, H2 to the medium.",
+ "transfer": {
+  "type": "fba",
+  "path": "data/imethanogen.xml",
+  "vmax": 10.0,
+  "port_map": {
+   "EX_meoh_e": "methanol",
+   "EX_h2_e": "hydrogen",
+   "EX_ac_e": "acetate",
+   "EX_nh4_e": "ammonium",
+   "EX_pi_e": "phosphate",
+   "EX_ch4_e": "methane",
+   "EX_co2_e": "CO2",
+   "EX_h2o_e": "H2O",
+   "EX_h_e": "H_ext"
+  }
+ },
+ "ports": {
+  "methanol": {
+   "formula": "CH4O",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:17790"
+  },
+  "hydrogen": {
+   "formula": "H2",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:18276"
+  },
+  "acetate": {
+   "formula": "C2H3O2",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:30089"
+  },
+  "ammonium": {
+   "formula": "H4N",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:28938"
+  },
+  "phosphate": {
+   "formula": "HO4P",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:43474"
+  },
+  "methane": {
+   "formula": "CH4",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16183"
+  },
+  "CO2": {
+   "formula": "CO2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16526"
+  },
+  "H2O": {
+   "formula": "H2O",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15377"
+  },
+  "H_ext": {
+   "formula": "H",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15378"
+  }
+ },
+ "validity": {
+  "note": "dynamic FBA; strict anaerobe (O2-intolerant). Fluxes mmol/gDW/h-scale."
+ },
+ "context": {
+  "phase": "aqueous",
+  "requires": [
+   "H2O"
+  ],
+  "ranges": {
+   "Eh_mV": [
+    -400.0,
+    -200.0
+   ]
+  },
+  "o2_relationship": "strict-anaerobe (O2-toxic)"
+ }
+}

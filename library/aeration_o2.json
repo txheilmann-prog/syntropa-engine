@@ -1,0 +1,29 @@
+{
+  "id": "aeration_o2",
+  "name": "Surface O2 aeration (Henry's-law relaxation; mg/L units, temperature-bounded)",
+  "kind": "chemistry",
+  "schema_version": "1.0",
+  "open_boundary": true,
+  "provenance": [
+    {"source": "first-principles", "ref": "Henry's law surface gas exchange dO2=kLa(O2sat-O2)", "retrieved": "2026-07-10"},
+    {"source": "Benson-Krause / USGS DOTABLES", "ref": "Dissolved-oxygen solubility in fresh water, 1 atm; standard tabulated mg/L vs degC", "retrieved": "2026-07-10", "confidence": "measured"},
+    {"source": "Stumm & Morgan, Aquatic Chemistry (3rd ed., 1996), redox-sequence ladder", "ref": "surface aeration equilibrates water with atmospheric O2, holding an OXIC redox poise in the oxidizing window Eh ~ +50..+500 mV; incompatible with strict-anaerobe habitats (methanogenesis, Eh < -200 mV)", "retrieved": "2026-07-11", "confidence": "textbook"}
+  ],
+  "notes": "Diversity-first stress component #3: the DIMENSIONED-UNITS box. It speaks three non-canonical units at once -- O2 in mg/L, temperature in degC, pressure in atm -- none of them the medium's canonical (mmol, K, bar). Forces schema-v1 TODO #2 across three dimensions: mg/L<->mmol via O2's molar mass, degC<->K (AFFINE offset), atm<->bar. O2 saturation uses REAL Benson-Krause/USGS solubility data (mg/L vs degC at 1 atm, in params.O2_solubility_mgL) scaled by pressure per Henry's law -- NOT a fabricated temperature term. kLa is a genuine system-specific transfer coefficient. Declares temperature+pressure validity domains (TODO #4).",
+  "transfer": {"type": "function", "name": "aeration"},
+  "params": {
+    "kLa": 0.5,
+    "O2_solubility_mgL": [[0, 14.62], [5, 12.77], [10, 11.29], [15, 10.08], [20, 9.09], [25, 8.26], [30, 7.56], [35, 6.95], [40, 6.41]]
+  },
+  "ports": {
+    "O2":          {"formula": "O2", "role": "modifier", "chemical": true, "unit": "mg/L", "entity_id": "ChEBI:15379"},
+    "temperature": {"formula": null, "role": "environment", "chemical": false, "unit": "degC", "entity_id": "PATO:temperature"},
+    "pressure":    {"formula": null, "role": "environment", "chemical": false, "unit": "atm", "entity_id": "PATO:pressure"}
+  },
+  "validity": {
+    "note": "Henry's-law saturation is temperature- and pressure-specific; O2_sat_ref=9.1 mg/L at 20 degC, 1 atm. Valid in liquid water 0-40 degC, ~0.5-2 atm.",
+    "temperature": [0.0, 40.0],
+    "pressure": [0.5, 2.0]
+  },
+  "context": {"bridges": ["gas", "aqueous"], "requires": ["H2O"], "ranges": {"Eh_mV": [50.0, 500.0]}}
+}

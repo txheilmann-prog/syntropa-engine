@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "id": "glycolysis_teusink",
+  "name": "Yeast glycolysis (Teusink 2000) as a black box",
+  "kind": "reaction_network",
+  "open_boundary": true,
+  "provenance": [
+    {"source": "BioModels-CC0", "ref": "BIOMD0000000064", "retrieved": "2026-07-10"},
+    {"source": "publication", "ref": "Teusink et al. 2000 Eur J Biochem", "retrieved": "2026-07-10"}
+  ],
+  "notes": "OPEN by construction: this is a PARTIAL 2-port projection (glucose in, pyruvate out) of the full glycolysis model. Glucose (C6H12O6) -> 2 pyruvate (C6H6O6) leaves 6 H that go to the balancing intracellular species (H+, H2O, NAD(H), ATP/ADP, Pi) -- which are NOT medium ports. So the box exchanges those atoms with an unmodelled intracellular compartment, exactly the open-boundary case; its declared net flux is the boundary. (An expert would flag the alternative -- exposing ATP/NADH in a shared extracellular medium -- as wrong.)",
+  "transfer": {"type": "sbml", "path": "data/teusink_glycolysis.xml",
+               "port_map": {"GLCi": "glucose", "PYR": "pyruvate"}},
+  "ports": {
+    "glucose":  {"formula": "C6H12O6", "role": "input",  "entity_id": "ChEBI:4167"},
+    "pyruvate": {"formula": "C3H3O3",  "role": "output", "entity_id": "ChEBI:15361"}
+  },
+  "validity": {"note": "kinetic model; unit compartment assumed (amount~conc) -- v0.1 schema TODO"}
+}

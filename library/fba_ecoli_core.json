@@ -1,0 +1,133 @@
+{
+ "id": "fba_ecoli_core",
+ "name": "E. coli core metabolism (genome-scale, driven by dynamic FBA)",
+ "kind": "organism",
+ "schema_version": "1.0",
+ "open_boundary": true,
+ "provenance": [
+  {
+   "source": "BiGG",
+   "ref": "e_coli_core (textbook)",
+   "retrieved": "2026-07-10"
+  },
+  {
+   "source": "Orth2010",
+   "ref": "doi:10.1038/nbt.1614",
+   "retrieved": "2026-07-10"
+  }
+ ],
+ "notes": "Diversity-first stress component #2: a genome-scale metabolic network with NO rate laws, driven as a black box by dynamic FBA (cobra). (a) OPEN BOUNDARY -- biomass drains atoms out of the tracked medium; the exchange reactions ARE the declared boundary (TODO #3). (b) CANONICAL IDENTITY -- resolved the honest way AFTER the carbonate #4 finding: identity is a canonical ChEBI entity_id (which reconciles this box's pyruvate with a kinetic model's pyruvate), and the formula carries the species' ACTUAL atoms (pyruvate anion C3H3O3 = 3 H, not a neutralized 4 H). The earlier neutralization was RETIRED because it corrupted hydrogen counts. BiGG species ids are provenance (see port_map / the EX_ reaction ids), not identity. Charge is left untracked here (genome-scale charge balance is a separate concern); acid/base boxes like carbonate_system declare it.",
+ "transfer": {
+  "type": "fba",
+  "path": "data/e_coli_core.xml",
+  "vmax": 10.0,
+  "port_map": {
+   "EX_glc__D_e": "glucose",
+   "EX_o2_e": "O2",
+   "EX_h2o_e": "H2O",
+   "EX_nh4_e": "ammonium",
+   "EX_pi_e": "phosphate",
+   "EX_co2_e": "CO2",
+   "EX_ac_e": "acetate",
+   "EX_etoh_e": "ethanol",
+   "EX_for_e": "formate",
+   "EX_lac__D_e": "lactate",
+   "EX_pyr_e": "pyruvate",
+   "EX_succ_e": "succinate",
+   "EX_h_e": "H_ext"
+  }
+ },
+ "ports": {
+  "glucose": {
+   "formula": "C6H12O6",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:4167"
+  },
+  "O2": {
+   "formula": "O2",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:15379"
+  },
+  "H2O": {
+   "formula": "H2O",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:15377"
+  },
+  "ammonium": {
+   "formula": "H4N",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:28938"
+  },
+  "phosphate": {
+   "formula": "HO4P",
+   "role": "input",
+   "chemical": true,
+   "entity_id": "ChEBI:43474"
+  },
+  "CO2": {
+   "formula": "CO2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16526"
+  },
+  "acetate": {
+   "formula": "C2H3O2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:30089"
+  },
+  "ethanol": {
+   "formula": "C2H6O",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16236"
+  },
+  "formate": {
+   "formula": "CHO2",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15740"
+  },
+  "lactate": {
+   "formula": "C3H5O3",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:16651"
+  },
+  "pyruvate": {
+   "formula": "C3H3O3",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15361"
+  },
+  "succinate": {
+   "formula": "C4H4O4",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:30031"
+  },
+  "H_ext": {
+   "formula": "H",
+   "role": "output",
+   "chemical": true,
+   "entity_id": "ChEBI:15378"
+  }
+ },
+ "validity": {
+  "note": "dynamic FBA: valid at quasi-steady-state (dt >> internal metabolic timescale, balanced growth). Fluxes are mmol/gDW/h-scale; unit reconciliation with concentration-based boxes is TODO #2."
+ },
+ "context": {
+  "ranges": {
+   "Eh_mV": [
+    -300.0,
+    500.0
+   ]
+  },
+  "o2_relationship": "facultative-anaerobe",
+  "requires": []
+ }
+}

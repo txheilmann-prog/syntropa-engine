@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+*.so
+.DS_Store
+
+# link-only demo models fetched at runtime (see MODELS.md); not committed
+library/data/e_coli_core.xml
+library/data/icyano.xml
+library/data/icyano_auto.xml
+library/data/imethanogen.xml

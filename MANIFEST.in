@@ -1,0 +1,7 @@
+include LICENSE NOTICE README.md MODELS.md SCHEMA.md reproduce.py requirements-lock.txt
+recursive-include library *.json *.xml *.md
+recursive-include tests *.py
+exclude library/data/e_coli_core.xml
+exclude library/data/icyano.xml
+exclude library/data/icyano_auto.xml
+exclude library/data/imethanogen.xml
