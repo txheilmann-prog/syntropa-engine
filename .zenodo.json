@@ -1,0 +1,15 @@
+{
+  "title": "Syntropa: a physics-gated substrate for composing and validating heterogeneous cell and ecosystem models",
+  "description": "A Python substrate for composing heterogeneous biological models (first-principles reactions, empirical lookups, kinetic SBML, genome-scale FBA) into micro-ecosystems checked by a layered physics-based validity stack. Open core, Apache-2.0.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "creators": [
+    {"name": "Heilmann, Craig", "orcid": "0009-0007-6648-7076"}
+  ],
+  "keywords": ["systems biology", "model composition", "flux balance analysis", "thermodynamics", "reproducibility"],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.22129408", "relation": "isSupplementTo", "scheme": "doi"},
+    {"identifier": "10.5281/zenodo.22019863", "relation": "references", "scheme": "doi"}
+  ]
+}
