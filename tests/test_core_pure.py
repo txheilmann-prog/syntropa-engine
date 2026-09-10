@@ -35,6 +35,24 @@ def test_conservation_flags_an_atom_leak():
     assert "C" in report.leaking
 
 
+def test_heterogeneous_composition_conserves_mass():
+    """Compose a first-principles function box with an empirical-lookup box over one shared medium, run the
+    Vivarium trajectory, and confirm whole-system mass conservation -- the composition, validity, and
+    conservation core exercised end to end, offline (no FBA solve, no network)."""
+    import microcosm.builtins  # noqa: F401  (registers the function transfers, e.g. aerobic_respiration)
+    from microcosm import load_component
+    from microcosm.engine import run_netlist
+    lib = os.path.join(ROOT, "library")
+    resp = load_component(os.path.join(lib, "respiration.json"))       # first-principles function
+    ferm = load_component(os.path.join(lib, "fermenter_lookup.json"))  # empirical lookup table
+    res, report = run_netlist([resp, ferm],
+                              {"initial_medium": {"glucose": 20.0, "O2": 10.0}, "duration": 20.0})
+    assert res["composition_problems"] == []      # the two boxes can share one well-mixed medium
+    assert res["diverged"] is None                # the trajectory did not blow up
+    assert report.conserved                       # atoms balance over the whole trajectory
+    assert not report.leaking
+
+
 def test_licensing_is_fail_closed_and_correct():
     assert licensing.may_redistribute("BioModels-CC0 (BMDB)") is True           # CC0, freely re-servable
     assert licensing.may_redistribute("BiGG") is False                          # link-only; cite the source

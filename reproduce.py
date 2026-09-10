@@ -26,10 +26,13 @@ from microcosm.thermo import route_dg
 
 _failures = []
 _skips = []
+_ran = 0
 
 
 def check(label, got, expected, tol):
     """Numeric known-answer: PASS if within tolerance, else record a failure."""
+    global _ran
+    _ran += 1
     ok = isinstance(got, (int, float)) and abs(got - expected) <= tol
     if not ok:
         _failures.append(label)
@@ -123,14 +126,39 @@ def main():
             if not ok:
                 _failures.append(f"H2 threshold ({name})")
 
+    print("\n6. HETEROGENEOUS COMPOSITION -- a first-principles box + an empirical-lookup box over one medium, mass conserved")
+    try:
+        from microcosm.engine import run_netlist
+        resp = try_load(os.path.join(ROOT, "library", "respiration.json"))       # first-principles function
+        ferm = try_load(os.path.join(ROOT, "library", "fermenter_lookup.json"))  # empirical lookup table
+        if resp is not None and ferm is not None:
+            res, rep = run_netlist([resp, ferm],
+                                   {"initial_medium": {"glucose": 20.0, "O2": 10.0}, "duration": 20.0})
+            resid = max((abs(v) for v in rep.elements.values()), default=0.0)
+            note("compose two transfer formalisms, then run", f"{len(res['species'])} medium species over {rep.n_steps} steps", "runs")
+            note("composition problems / divergence", f"{res['composition_problems'] or 'none'} / {res['diverged']}", "none / None")
+            note("species leaking atoms", ", ".join(rep.leaking) if rep.leaking else "none", "none")
+            check("max atom-conservation residual over trajectory", round(resid, 9), 0.0, 1e-6)
+            if res["composition_problems"] or res["diverged"] is not None or rep.leaking:
+                _failures.append("heterogeneous composition (problem/divergence/leak)")
+        else:
+            skip("the bundled respiration + fermenter demo components")
+    except RuntimeError as e:
+        skip(f"the netlist simulator ({type(e).__name__})")
+
     if _failures:
         print(f"\n{len(_failures)} CHECK(S) FAILED: {', '.join(_failures)}")
         print("(FBA/thermodynamic numbers are solver- and version-sensitive; see the reproducibility note above.)")
         sys.exit(1)
+    if not _ran:
+        print("\nNO HEADLINE CHECK EXECUTED -- every section skipped (offline, missing link-only models, or a cold "
+              "eQuilibrator cache). Nothing was verified, so this is a failure, not a pass. Re-run with network "
+              "access, or install the pinned requirements-lock.txt. See MODELS.md.")
+        sys.exit(1)
     if _skips:
-        print(f"\n{len(_skips)} section(s) SKIPPED because a network resource was unavailable (link-only models are "
-              f"fetched from their source, and the eQuilibrator cache downloads, on first run). Everything that ran is "
-              f"within tolerance; re-run with network access to reproduce the rest. See MODELS.md.")
+        print(f"\n{_ran} numeric check(s) passed; {len(_skips)} section(s) SKIPPED because a network resource was "
+              f"unavailable (link-only models are fetched from their source, and the eQuilibrator cache downloads, on "
+              f"first run). Everything that ran is within tolerance; re-run with network access for the rest. See MODELS.md.")
         return
     print("\nAll headline results regenerated and within tolerance. See tests/ for the full assertion suite.\n")
 

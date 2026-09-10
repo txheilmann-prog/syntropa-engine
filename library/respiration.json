@@ -9,7 +9,7 @@
     {"source": "textbook", "ref": "C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O", "retrieved": "2026-07-10"},
     {"source": "Stumm & Morgan, Aquatic Chemistry (3rd ed., 1996), redox-sequence ladder", "ref": "aerobic respiration requires the OXIDIZING window Eh ~ +50..+500 mV (O2/H2O couple, circumneutral oxic water); disjoint from strict-anaerobe methanogenesis (Eh < -200 mV)", "retrieved": "2026-07-11", "confidence": "textbook"}
   ],
-  "notes": "CONSOLIDATION component #2 (stopping-rule test): the mirror of photosynthesis, a closed atom-balanced function box using ONLY already-grounded species (glucose, O2, CO2, H2O) with canonical ChEBI ids. It exercises no new transfer type, dimension, facet, or identity mechanism. Together with pritchard_glycolysis (also dry) this is the second consecutive component that surfaces nothing new -> the stopping rule for a schema-v1 freeze is met. Chains with phototroph_generic into a closed carbon cycle.",
+  "notes": "A closed, atom-balanced first-principles function box (the mirror of photosynthesis) over already-grounded species (glucose, O2, CO2, H2O) with canonical ChEBI ids. Chains with a phototroph box into a closed carbon cycle.",
   "transfer": {"type": "function", "name": "aerobic_respiration"},
   "params": {"rate": {"default": 0.2, "range": [0.0, 2.0]}},
   "ports": {

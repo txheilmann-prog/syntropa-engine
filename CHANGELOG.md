@@ -14,5 +14,5 @@ biological models.
   conservation, thermodynamic feasibility (eQuilibrator + curated low-potential electron carriers), and per-box
   validity domains, plus an optional enzyme-constraint (sMOMENT) layer.
 - Grounded identity (ChEBI/BiGG, actual-atom formulas, charge) and dimensioned units.
-- A super-additivity emergence test and a directed FBA-essentiality analysis.
+- A super-additivity emergence test and a per-hand-off thermodynamic feasibility screen.
 - A published known-answer benchmark (E. coli core, Orth et al. 2010), reproduce.py, and a public-API test.

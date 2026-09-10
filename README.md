@@ -40,8 +40,8 @@ just the sections whose model or eQuilibrator cache it cannot fetch (with a clea
 
 FBA growth rates depend on the LP solver and its version (the reported values reproduce to within ~1% across
 solver stacks). For bit-stable numbers, install the pinned environment in `requirements-lock.txt`. The first run
-that uses the thermodynamic gate (including `reproduce.py`) downloads the eQuilibrator compound cache (a few
-hundred MB) once; later runs reuse it.
+that uses the thermodynamic gate (including `reproduce.py`) downloads the eQuilibrator compound cache (about 1
+GB) once; later runs reuse it.
 
 ## Public API
 

@@ -11,12 +11,12 @@
    "retrieved": "2026-07-10"
   },
   {
-   "source": "Orth2010",
-   "ref": "doi:10.1038/nbt.1614",
+   "source": "Orth, Fleming & Palsson 2010 (EcoSal Plus)",
+   "ref": "doi:10.1128/ecosalplus.10.2.1",
    "retrieved": "2026-07-10"
   }
  ],
- "notes": "Diversity-first stress component #2: a genome-scale metabolic network with NO rate laws, driven as a black box by dynamic FBA (cobra). (a) OPEN BOUNDARY -- biomass drains atoms out of the tracked medium; the exchange reactions ARE the declared boundary (TODO #3). (b) CANONICAL IDENTITY -- resolved the honest way AFTER the carbonate #4 finding: identity is a canonical ChEBI entity_id (which reconciles this box's pyruvate with a kinetic model's pyruvate), and the formula carries the species' ACTUAL atoms (pyruvate anion C3H3O3 = 3 H, not a neutralized 4 H). The earlier neutralization was RETIRED because it corrupted hydrogen counts. BiGG species ids are provenance (see port_map / the EX_ reaction ids), not identity. Charge is left untracked here (genome-scale charge balance is a separate concern); acid/base boxes like carbonate_system declare it.",
+ "notes": "A genome-scale metabolic network with no rate laws, driven as a black box by dynamic FBA (cobra). Open boundary: biomass drains atoms out of the tracked medium, and the exchange reactions are the declared boundary. Identity is a canonical ChEBI entity_id (so this box's pyruvate reconciles with a kinetic model's pyruvate), and each formula carries the species' actual atoms (the pyruvate anion is C3H3O3, not a neutralized form). BiGG species ids are provenance (see the port_map / EX_ reaction ids), not identity. Charge is not tracked here (genome-scale charge balance is a separate concern); acid/base boxes such as carbonate_system declare it.",
  "transfer": {
   "type": "fba",
   "path": "data/e_coli_core.xml",
@@ -118,7 +118,7 @@
   }
  },
  "validity": {
-  "note": "dynamic FBA: valid at quasi-steady-state (dt >> internal metabolic timescale, balanced growth). Fluxes are mmol/gDW/h-scale; unit reconciliation with concentration-based boxes is TODO #2."
+  "note": "dynamic FBA: valid at quasi-steady-state (dt >> internal metabolic timescale, balanced growth). Fluxes are mmol/gDW/h-scale; unit reconciliation with concentration-based boxes is approximate."
  },
  "context": {
   "ranges": {
