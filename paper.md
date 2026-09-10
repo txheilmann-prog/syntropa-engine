@@ -122,8 +122,11 @@ published known answers, rather than to internal consistency alone, is what make
 
 # AI usage disclosure
 
-Large language models were used to help draft and edit this paper and to assist with code review and refactoring
-during development.
+Large language models (Anthropic Claude, Opus and Sonnet models) were used in this work: to assist with drafting
+and copy-editing the paper, and with code review, refactoring, and test scaffolding for the software. All
+scientific choices, the software design, model-value sourcing, and validation were made and directed by the
+author, who reviewed, edited, and verified every AI-assisted output; no result, number, or citation was accepted
+without checking it against its source.
 
 # Acknowledgements
 
