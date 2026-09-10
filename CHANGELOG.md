@@ -3,7 +3,17 @@
 All notable changes to this project are documented here. The format follows Keep a Changelog, and the project
 uses semantic versioning.
 
-## [0.1.0] - 2026-09-02
+## [0.1.1] - 2026-09-10
+
+### Added
+- The JOSS paper (paper.md, paper.bib).
+- An offline heterogeneous-composition and whole-system mass-conservation check in reproduce.py, and a matching test.
+
+### Changed
+- reproduce.py exits non-zero when no numeric check ran (an all-skip run is no longer a silent pass).
+- Clarified demo-manifest notes; corrected the E. coli core citation.
+
+## [0.1.0] - 2026-09-09
 
 First public release: the open simulator substrate for composing and physics-validating heterogeneous
 biological models.
