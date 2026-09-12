@@ -1,5 +1,7 @@
 # Syntropa
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22728655.svg)](https://doi.org/10.5281/zenodo.22728655)
+
 A physics-gated substrate for composing **heterogeneous** biological models -- first-principles reactions, empirical
 lookup tables, whole kinetic SBML models, and genome-scale flux-balance (FBA) models -- into micro-ecosystems that
 exchange matter through a shared, chemically-grounded medium. Distributed as the `syntropa-engine` package; imported as `microcosm`.
@@ -69,8 +71,10 @@ inside the `library/` tree.
 
 ## How to cite
 
-Please cite the Syntropa preprint: https://doi.org/10.5281/zenodo.22129408 (a software paper is in preparation).
-Each bundled demonstration model retains its own original source and citation; see `MODELS.md`.
+Cite this software by its archived-release DOI: https://doi.org/10.5281/zenodo.22728655 (the concept DOI, which always
+resolves to the latest version). Please also cite the Syntropa preprint: https://doi.org/10.5281/zenodo.22129408
+(a software paper is in preparation). Each bundled demonstration model retains its own original source and citation;
+see `MODELS.md`.
 
 ## License
 

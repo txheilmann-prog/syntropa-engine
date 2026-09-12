@@ -9,6 +9,7 @@ authors:
 license: Apache-2.0
 repository-code: "https://github.com/txheilmann-prog/syntropa-engine"
 url: "https://github.com/txheilmann-prog/syntropa-engine"
+doi: 10.5281/zenodo.22728655
 version: 0.1.1
 date-released: "2026-09-10"
 keywords:
