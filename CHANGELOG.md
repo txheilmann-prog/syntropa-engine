@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. The format follows Keep a Changelog, and the project
 uses semantic versioning.
 
-## [0.1.2] - 2026-10-09
+## [0.1.2] - 2026-10-20
 
 Three of the four changes here are caveats and measured bounds rather than features. A validity stack is
 only worth what its stated limits are worth, so the limits ship.

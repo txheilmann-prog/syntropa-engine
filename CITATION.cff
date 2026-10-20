@@ -11,7 +11,7 @@ repository-code: "https://github.com/txheilmann-prog/syntropa-engine"
 url: "https://github.com/txheilmann-prog/syntropa-engine"
 doi: 10.5281/zenodo.22728655
 version: 0.1.2
-date-released: "2026-10-09"
+date-released: "2026-10-20"
 keywords:
   - systems biology
   - model composition
