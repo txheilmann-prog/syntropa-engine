@@ -27,6 +27,43 @@ import cobra
 NOMINAL_KCAT_PER_S = 65.0    # nominal uniform turnover (1/s); central-carbon enzymes ~ tens-hundreds /s
 NOMINAL_MW_KDA = 40.0        # nominal average enzyme molecular weight (kDa = g/mmol)
 
+# THE BUDGET EVERY CALLER ACTUALLY USES, and it is not `enzyme_constrain`'s own default. The pilots, the use
+# case search and every evidence harness pass 0.1 g protein / gDW; `enzyme_constrain(budget=0.04)` below is the
+# signature default and NOTHING in the tree passes it. Keeping the live value as a bare literal at dozens of call
+# sites is what let the two drift apart unnoticed, so it lives here and callers import it.
+#
+# THIS IS A CHOSEN SETTING, NOT A MEASURED PARAMETER, and it is labeled that way for the same reason the nominal
+# kcat above is. Neither 0.1 nor 0.04 is derived from a measurement or a citation; the change that introduced 0.1
+# named the mechanism and not the magnitude.
+#
+# WHAT IS MEASURED ABOUT IT, because a setting without a reason can still have a bound. Sweeping the budget over
+# 0.04, 0.1, 0.2 and 0.4 on the methanogen syntrophy use case:
+#   - EMERGENCE VERDICTS are invariant across the whole range, so a binary discovery claim does not rest on it.
+#   - ABSOLUTE PRODUCTION tracks the budget below 0.1 and saturates above it, unevenly across candidates, so a
+#     flux computed at one budget CANNOT be converted to another by arithmetic. Re-run instead.
+#   - ABOVE ROUGHLY 0.1 THE POOL GOES SLACK AND THE CONSTRAINT STOPS BINDING. Six of eight abundance ratios give
+#     the identical unblocked optimum at 0.2 and at 0.4, and a route dependence that measures about 15 percent at
+#     0.1 measures exactly 0 at 0.4: block the reaction and the model pays for the alternative out of a budget it
+#     was not spending. At that point the model is back to the unlimited free catalysis this module exists to
+#     remove, so budgets much above 0.1 defeat the purpose of enzyme-constraining at all.
+# So any claim whose magnitude depends on the budget must be quoted WITH the budget, and 0.1 is inside the regime
+# where the constraint is active while 0.2 is already leaving it.
+#
+# THE AUTHORITATIVE UPGRADE is the same one the kcat note names: a budget derived from a measured proteome mass
+# fraction and saturation for these organisms, which turns the setting into a parameter.
+#
+# WHICH CALL SITES IMPORT THIS, and why the rest deliberately do NOT. The ones that convert are the ones where a
+# single source of truth is what you want: `outcome.py`'s two signature defaults (the only place under `src/`
+# that baked a VALUE rather than taking one, every other module correctly defaulting to None) and the use case
+# search's scorers. The ones that KEEP their literal are TESTS and RECORDED-EVIDENCE HARNESSES, on purpose:
+# `tests/test_carbon_leak.py` and `tests/test_feedstock_dependence.py` PIN behavior at 0.1, so importing the
+# constant would silently retarget what they assert the moment the constant moved, converting an assertion into a
+# follower. Evidence harnesses are the same case, since their recorded numbers belong to the value that produced
+# them. `tests/test_enzyme_budget_home.py` enforces exactly this split, both directions: no baked budget VALUE
+# anywhere under `src/`, and the pinning tests must KEEP their literal, so a well-meant cleanup cannot quietly
+# turn an assertion into a follower.
+PILOT_BUDGET = 0.1           # g protein / gDW -- the budget the engine and every harness actually run
+
 # On-disk cache of enzyme-constrained models. It persists across runs (avoids re-constraining the same member
 # on every evaluation), but MUST be bounded with an eviction policy (below): keyed with no eviction, a cache
 # like this grows without limit and can fill the system drive.

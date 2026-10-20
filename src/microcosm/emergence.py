@@ -19,7 +19,8 @@ from .community import community_transform
 from .search import target_value
 
 
-def _production(members, target, available, feed, vmax, enzyme_budget, consume, directed=False):
+def _production(members, target, available, feed, vmax, enzyme_budget, consume, directed=False,
+                abundances=None):
     """Return (target production, feasible). feasible=False means the community LP could not support all
     members (they cannot coexist on this medium) -- distinct from feasible-but-zero (they coexist but cannot
     make the target). The irreducibility metric must not conflate these.
@@ -38,7 +39,15 @@ def _production(members, target, available, feed, vmax, enzyme_budget, consume, 
     isolation semantics, but the platform's whole premise is that if C modifies A or B in ANY way the trio
     {A,B,C} is UNIQUE and not decomposable -- a cache that even looks like it assumes decomposability is the
     wrong instinct here, and exhaustive is cheap at current scale. Re-introduce only under real scale pressure,
-    with an explicit feed-/modify-through-C test."""
+    with an explicit feed-/modify-through-C test.
+
+    `abundances` maps component id -> BIOMASS FRACTION, defaulting to None, which is micom's equal split. All
+    three branches below reach a solver that accepts the keyword (community_screen, community_production and
+    community_transform each take it), so the value is simply passed through. Note what happens to a SUBSET:
+    micom renormalizes whatever fractions the subset is left with, so a singleton always solves at abundance 1.0
+    regardless of the community ratio. That is correct rather than a leak, because an organism alone IS 100
+    percent of its own biomass -- which also means the singleton BASELINES in super_additivity are
+    abundance-independent and the whole ratio effect lands on the community term."""
     try:
         if directed and consume:
             # DESTRUCTION USE-CASES measure UPTAKE, not export. This branch used to not exist ("consume-mode is
@@ -52,7 +61,7 @@ def _production(members, target, available, feed, vmax, enzyme_budget, consume, 
             # that is not offered is 0 by construction.
             from .community import community_screen
             r = community_screen(members, target, [target], available=available, feed=feed, vmax=vmax,
-                                 enzyme_budget=enzyme_budget)
+                                 abundances=abundances, enzyme_budget=enzyme_budget)
             if r.get("feasible"):
                 return float((r.get("uptake") or {}).get(target, 0.0)), True
             if r.get("solver_failed"):
@@ -61,7 +70,7 @@ def _production(members, target, available, feed, vmax, enzyme_budget, consume, 
         if directed:
             from .community import community_production
             r = community_production(members, target, available=available, feed=feed, vmax=vmax,
-                                     enzyme_budget=enzyme_budget)
+                                     abundances=abundances, enzyme_budget=enzyme_budget)
             if r.get("feasible"):
                 return float(r.get("production") or 0.0), True
             # A community that GREW but has no exchange for the target COEXISTS FINE -- it simply cannot make
@@ -74,17 +83,35 @@ def _production(members, target, available, feed, vmax, enzyme_budget, consume, 
                 return 0.0, True
             return 0.0, False
         r = community_transform(members, available=available, feed=feed, vmax=vmax, thermo=False,
-                                enzyme_budget=enzyme_budget)
+                                abundances=abundances, enzyme_budget=enzyme_budget)
         return (target_value(r, target, consume=consume), True) if r.get("feasible") else (0.0, False)
     except Exception:
         return 0.0, False
 
 
 def super_additivity(members, target, available=None, feed=None, vmax=10.0, max_enum=5, margin=0.02,
-                     enzyme_budget=None, consume=False, directed=False):
+                     enzyme_budget=None, consume=False, directed=False, abundances=None):
     """Community target production minus the BEST proper sub-community's. synergy>0 (beyond margin) and a
     non-trivial community amount => emergent. For <=max_enum members every proper subset is enumerated;
-    larger sets fall back to singletons + pairs (logged as partial). Returns the full comparison."""
+    larger sets fall back to singletons + pairs (logged as partial). Returns the full comparison.
+
+    `abundances` maps component id -> BIOMASS FRACTION. The default is None, micom's equal split, so omitting
+    the argument reproduces the behaviour of a call that never supplied one.
+
+    WHY IT MATTERS HERE SPECIFICALLY, and it is not symmetric. The SAME dict is handed to the full community
+    and to every proper subset, and micom renormalizes each subset's share, so a singleton solves at 1.0
+    whatever the community ratio is. The baselines are therefore abundance-INDEPENDENT while the community
+    term is not, which means synergy = community - best_subset absorbs the ENTIRE ratio effect. Where both
+    singletons are infeasible and produce nothing, synergy is numerically identical to the community
+    production, so the reported figure moves one-for-one with the chosen ratio.
+
+    THAT MAKES THE RATIO A FIRST-ORDER INPUT, NOT A DETAIL. An equal split is a modelling choice, not a
+    measurement, and for a syntrophic pair it is usually the wrong one: H2-scavenging methanogens are a
+    biomass minority in the environments these consortia are drawn from. Measured on a glucose-fed
+    fermenter-plus-methanogen pair, methane output spans roughly 0.2 to 2.6 across a methanogen biomass
+    fraction of 0.3 to 4 percent, against about 14.9 at an equal split, and the equal split sits near the
+    maximum of that curve. Supply a ratio appropriate to the system being modelled and state it alongside any
+    figure taken from this function."""
     if directed:                                       # an optional directed-production path, used when present
         try:
             from . import directed as _directed_layer  # noqa: F401
@@ -98,7 +125,8 @@ def super_additivity(members, target, available=None, feed=None, vmax=10.0, max_
     if available is None and directed:
         from .community import _derive_available
         available = _derive_available(members) or set()
-    comm, _ = _production(members, target, available, feed, vmax, enzyme_budget, consume, directed)
+    comm, _ = _production(members, target, available, feed, vmax, enzyme_budget, consume, directed,
+                          abundances)
     ids = list(range(len(members)))
     if len(members) <= max_enum:
         subsets = [c for k in range(1, len(members)) for c in itertools.combinations(ids, k)]
@@ -111,7 +139,7 @@ def super_additivity(members, target, available=None, feed=None, vmax=10.0, max_
     n_sub = len(subsets); n_feasible = 0
     for idx in subsets:
         p, feas = _production([members[i] for i in idx], target, available, feed, vmax, enzyme_budget,
-                              consume, directed)
+                              consume, directed, abundances)
         if feas:
             n_feasible += 1
             best_feasible = max(best_feasible, p)

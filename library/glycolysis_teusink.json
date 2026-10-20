@@ -15,5 +15,5 @@
     "glucose":  {"formula": "C6H12O6", "role": "input",  "entity_id": "ChEBI:4167"},
     "pyruvate": {"formula": "C3H3O3",  "role": "output", "entity_id": "ChEBI:15361"}
   },
-  "validity": {"note": "kinetic model; unit compartment assumed (amount~conc) -- v0.1 schema TODO"}
+  "validity": {"note": "kinetic model; unit compartment assumed (amount~conc), since the v0.1 schema carries no compartment volume"}
 }

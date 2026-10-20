@@ -7,7 +7,7 @@
     {"source": "BioModels-CC0", "ref": "BIOMD0000000010", "retrieved": "2026-07-10"},
     {"source": "Kholodenko2000", "ref": "doi:10.1046/j.1432-1327.2000.01197.x", "retrieved": "2026-07-10"}
   ],
-  "notes": "The stress-test for schema-v1 TODO #1: every species is a PROTEIN phospho-state (Mos/Mek1/Erk2 and their -P/-PP forms), NOT a chemical. They have no molecular formula and cannot be mass-checked; they are conserved by identity. Grounding via UniProt, not ChEBI/InChIKey. The conservation monitor must SKIP these, never false-flag them.",
+  "notes": "A schema stress-test case: every species is a PROTEIN phospho-state (Mos/Mek1/Erk2 and their -P/-PP forms), NOT a chemical. They have no molecular formula and cannot be mass-checked; they are conserved by identity. Grounding via UniProt, not ChEBI/InChIKey. The conservation monitor must SKIP these, never false-flag them.",
   "transfer": {
     "type": "sbml",
     "path": "data/kholodenko_mapk.xml",

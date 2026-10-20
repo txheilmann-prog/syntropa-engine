@@ -33,6 +33,42 @@ _KEGG_FALLBACK = {
 }
 
 
+def set_conditions(temperature_K=None, ionic_strength_M=None, p_h=None):
+    """Set the eQuilibrator aqueous conditions, and return what they are now. THE SPINE ENTRY POINT for this.
+
+    A caller studying condition sensitivity should come through here rather than importing `Q_` from
+    `equilibrator_api` directly: eQuilibrator access belongs behind this module so the defaults stay in one place
+    and cannot drift per caller. Returns a dict of the conditions actually in effect, so a caller can assert them.
+
+    READ THIS BEFORE SETTING `temperature_K`. It changes the Legendre transform but it does NOT give you a
+    temperature-corrected dG'^0, because eQuilibrator does not have one to give: its documentation states the
+    temperature is fixed at 25 C for all dG values, since dG at another temperature needs an entropy term the
+    component-contribution training set lacks for most compounds. MEASURED: hydrogenotrophic methanogenesis is
+    -195.10 kJ/mol at 298.15, 313.15 and 328.15 K alike, and propionate oxidation moves 0.01 kJ/mol over 30 K. A
+    caller that also raises `tfa.RT_DEFAULT` or `handoff_screen.RT` to match gets a HALF correction, with the
+    concentration term at the new temperature and dG'^0 still at 25 C, and that partial correction measurably
+    worsened agreement with documented obligate/facultative lifestyles in our own testing. `ionic_strength_M` and
+    `p_h` are different: both enter through the Legendre and Debye-Huckel terms, need no entropy data, and ARE
+    honored.
+    """
+    from equilibrator_api import Q_
+    cc = _cc()
+    if temperature_K is not None:
+        cc.temperature = Q_("%fK" % float(temperature_K))
+    if ionic_strength_M is not None:
+        cc.ionic_strength = Q_("%fM" % float(ionic_strength_M))
+    if p_h is not None:
+        cc.p_h = Q_(float(p_h))
+    return {"temperature_K": float(cc.temperature.magnitude),
+            "ionic_strength_M": float(cc.ionic_strength.magnitude),
+            "p_h": float(cc.p_h.magnitude)}
+
+
+def reset_conditions():
+    """Restore the engine defaults set in `_cc()`: pH 7.0, ionic strength 0.25 M, 298.15 K."""
+    return set_conditions(temperature_K=298.15, ionic_strength_M=0.25, p_h=7.0)
+
+
 def _cc():
     """ComponentContribution singleton. The FIRST call may download the eQuilibrator compound cache (~1 GB);
     that fetch is BOUNDED -- a per-read socket-stall timeout plus a hard total cap, run in a daemon thread so

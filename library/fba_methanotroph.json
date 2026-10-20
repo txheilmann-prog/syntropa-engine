@@ -19,7 +19,7 @@
   },
   {
    "source": "derivation",
-   "ref": "COARSE LUMPED single growth reaction: 10 CH4 + 15.75 O2 + NH4+ -> C4H8O2N + 6 CO2 + 17.5 H2O + H+ ; CCE and biomass formula are cited, all coefficients then fixed by C/H/O/N/charge conservation (documented in scripts/build_methanotroph.py). NOMINAL/coarse: no mechanistic pathway, no methanol/formaldehyde intermediates, no maintenance term.",
+   "ref": "COARSE LUMPED single growth reaction: 10 CH4 + 15.75 O2 + NH4+ -> C4H8O2N + 6 CO2 + 17.5 H2O + H+ ; CCE and biomass formula are cited, all coefficients then fixed by C/H/O/N/charge conservation. NOMINAL/coarse: no mechanistic pathway, no methanol/formaldehyde intermediates, no maintenance term.",
    "retrieved": "2026-07-11",
    "confidence": "nominal-grounded"
   }

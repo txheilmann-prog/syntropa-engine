@@ -16,6 +16,12 @@ Modelling choices, each grounded in cited physics (no fitted parameters):
 - Feasibility uses the dG' POINT estimate vs the quantum (this is what reproduces the measured thresholds); the
   component-contribution uncertainty band is reported separately by clears() as a MARGINAL flag, never to move the
   boundary.
+- THE THRESHOLD AGREEMENT IS CONDITIONAL ON THE SHIPPED SOLUTE CONCENTRATIONS, and that condition belongs
+  beside the claim rather than in a footnote. Being INSIDE a cited concentration window at a POINT says
+  nothing about the window. Swept across the cited acetate range, this screen stops reproducing the
+  Cord-Ruwisch acetogen threshold at BOTH ends: 46.09 Pa at the low end and 115.78 Pa at the high end,
+  against a published band of 50 to 95 Pa. The agreement is real and it is not unconditional, so a caller
+  changing a concentration is changing what this screen validates against, not merely its inputs.
 
 Concentrations, pH, ionic strength, and temperature here are engine DEFAULTS (25 C, the PHYS dict), explicit and
 overridable per hand-off via `conc=`; to model a specific medium supply its values (from a named published table)
@@ -27,7 +33,32 @@ import math
 
 from . import thermo
 
-RT = 8.314462618e-3 * 298.15            # kJ/mol at 298.15 K (engine default; pilot overrides to 310 K)
+# RT at 298.15 K, kJ/mol. A caller MAY raise this to model a warmer reactor, but read this first, because doing so
+# is a HALF correction and the other half is not available. MEASURED: eQuilibrator does NOT temperature-correct
+# dG'^0 at all. Setting `cc.temperature` is silently accepted and reported back while the value does not move:
+# hydrogenotrophic methanogenesis is -195.10 kJ/mol at 298.15, 313.15 AND 328.15 K alike, and propionate
+# oxidation shifts 0.01 kJ/mol over 30 K. eQuilibrator's own documentation gives the reason, that dG at another
+# temperature needs the entropy term, which the component-contribution training set lacks for most compounds. So
+# raising RT here moves the ln-concentration term to the new temperature while dG'^0 stays pinned at 25 C, mixing
+# two temperatures inside one inequality, and a partial correction of that kind measurably WORSENED agreement
+# with documented obligate/facultative lifestyles in our own testing: a documented obligate aromatic syntrophy
+# read as facultative at 37, 39 and 55 C alike. Treat every verdict as sign-feasibility at 25 C until a
+# thermodynamic data source carrying enthalpy or entropy data replaces the estimator.
+RT = 8.314462618e-3 * 298.15
+# EVERY VERDICT HERE IS BULK-PHASE, AND CONDITIONAL ON THE MEMBERS ACHIEVING LOCAL PROXIMITY. There is one shared
+# concentration per metabolite and no spatial, diffusion or aggregation variable anywhere in this module, while
+# interspecies H2 and formate transfer is diffusion-limited: the decisive concentration is the one AT THE CELL-TO-CELL
+# INTERFACE, which is why syntrophs aggregate.
+# THE NARROWNESS OF THE WINDOWS IS WHY THIS MATTERS, measured rather than asserted. `handoff_window` on the obligate
+# syntrophies returns a band spanning a factor of only about 1.5 to 4: propionate to methanogen is feasible between
+# 2 and 3 Pa in the high-CO2 regime, 3 to 7 Pa in the low. A band that narrow is a statement about a controlled
+# microenvironment, not about a stirred vessel where dissolved H2 ranges over orders of magnitude. The internal
+# control is the NOT-obligate case: lactate oxidation returns a window six orders of magnitude wide, so window width
+# tracks obligate-ness and the narrow bands are narrow for a physical reason.
+# CONSEQUENCE FOR READING ANY RESULT FROM THIS MODULE: bulk-phase feasibility is NECESSARY AND NOT SUFFICIENT for a
+# hand-off to occur. Nothing in a well-mixed formulation can establish that two organisms will aggregate, so
+# proximity is either engineered (co-immobilization, a biofilm carrier, granulation) or tested BEFORE the conversion
+# is tested, since a negative result in a stirred vessel cannot distinguish wrong chemistry from cells too far apart.
 QUANTUM = 20.0                           # Schink per-organism energy quantum, kJ/mol (Schink 1997)
 kH_H2 = 7.8e-4                           # dissolved H2 solubility, M/atm (Henry, ~25 C)
 
@@ -51,18 +82,28 @@ def _dg0(sub: dict, prod: dict):
     return (d["dg0_prime_kj_mol"], d.get("uncertainty_kj_mol", 0.0)) if d.get("reliable") else (None, None)
 
 
-def dg_prime(sub: dict, prod: dict, conc: dict):
-    """dG' (kJ/mol) at the given activities; water activity held at 1. Returns (dg, uncertainty) or (None, None)."""
-    g0, err = _dg0(sub, prod)
-    if g0 is None:
-        return None, None
+def _lnQ(sub: dict, prod: dict, conc: dict) -> float:
+    """ln Q at the given activities; water activity held at 1.
+
+    Split out of `dg_prime` because it is the ONLY concentration-dependent half of dG' = dG'0 + RT ln Q. A
+    concentration SCAN re-evaluates this and nothing else, so the scans below hoist dG'0 out of their loops and
+    call this per point. One implementation, used by both, so the two cannot drift apart.
+    """
     lnQ = 0.0
     for side, sign in (("sub", -1), ("prod", +1)):
         for b, n in (sub if side == "sub" else prod).items():
             if b == "h2o":
                 continue
             lnQ += sign * n * math.log(conc.get(b, PHYS.get(b, DEFAULT_CONC)))
-    return g0 + RT * lnQ, err
+    return lnQ
+
+
+def dg_prime(sub: dict, prod: dict, conc: dict):
+    """dG' (kJ/mol) at the given activities; water activity held at 1. Returns (dg, uncertainty) or (None, None)."""
+    g0, err = _dg0(sub, prod)
+    if g0 is None:
+        return None, None
+    return g0 + RT * _lnQ(sub, prod, conc), err
 
 
 def clears(dg, err, quantum=QUANTUM):
@@ -80,12 +121,17 @@ def solo_threshold(sub, prod, shared="h2", conc=None, quantum=QUANTUM, lo=1e-11,
     """The [shared] boundary at which one reaction just clears the quantum (point estimate). Returns (kind, M):
     'ceiling' (max [shared]) for a shared-metabolite PRODUCER, 'floor' (min [shared]) for a CONSUMER."""
     conc = dict(PHYS, **(conc or {}))
+    # HOISTED: dG'0 is concentration-INDEPENDENT, so this scan needed ONE eQuilibrator evaluation and was
+    # making n+1 identical ones. An unreliable reaction is unreliable at every point, so the early return is
+    # the same answer the loop reached by finding nothing feasible.
+    g0, _err = _dg0(sub, prod)
+    if g0 is None:
+        return (None, None)
     feas = []
     for i in range(n + 1):
         m = lo * (hi / lo) ** (i / n)
         c = dict(conc); c[shared] = m
-        dg, _ = dg_prime(sub, prod, c)
-        if dg is not None and dg <= -quantum:
+        if g0 + RT * _lnQ(sub, prod, c) <= -quantum:
             feas.append(m)
     if not feas:
         return (None, None)
@@ -99,15 +145,18 @@ def handoff_window(producer, consumer, shared="h2", conc=None, q_prod=0.0, q_con
     the producer's electron-DISPOSAL step needs only dG' < 0 (q_prod=0); the energy-CONSERVING scavenger must
     clear the Schink quantum (q_cons=20). producer/consumer are (sub, prod) reaction dicts."""
     conc = dict(PHYS, **(conc or {}))
+    # HOISTED, same reason as solo_threshold: two dG'0 evaluations rather than two per point. If either
+    # reaction is unreliable it is unreliable at every point, which the old loop expressed as `continue` at
+    # every point and therefore an empty result.
+    gp, _ = _dg0(*producer)
+    gc, _ = _dg0(*consumer)
+    if gp is None or gc is None:
+        return None
     feas = []
     for i in range(n + 1):
         m = lo * (hi / lo) ** (i / n)
         c = dict(conc); c[shared] = m
-        dp, _ = dg_prime(*producer, c)
-        dc, _ = dg_prime(*consumer, c)
-        if dp is None or dc is None:
-            continue
-        if dp <= -q_prod and dc <= -q_cons:
+        if gp + RT * _lnQ(*producer, c) <= -q_prod and gc + RT * _lnQ(*consumer, c) <= -q_cons:
             feas.append(m)
     return (min(feas), max(feas)) if feas else None
 
